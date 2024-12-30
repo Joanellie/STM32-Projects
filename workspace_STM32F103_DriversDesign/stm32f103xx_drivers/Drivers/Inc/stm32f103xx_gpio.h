@@ -36,19 +36,19 @@ typedef enum GPIO_PINS{
  * Type: GPIO_ConfigInput_t
  *********************************************/
 typedef enum INPUT_TYPES{
-	GPIO_ANALOG,									/*GPIO Analog mode*/
-	GPIO_FLOATING,									/*GPIO Floating input mode*/
-	GPIO_PULL_UP_DOWN,								/*GPIO Input with pull-up or pull-down*/
+	GPIO_IN_ANALOG,									/*GPIO Analog mode*/
+	GPIO_IN_FLOATING,									/*GPIO Floating input mode*/
+	GPIO_IN_PULL_UP_DOWN,								/*GPIO Input with pull-up or pull-down*/
 }GPIO_ConfigInput_t;
 /**********************************************
  * GPIO Output Configuration
  * Type: GPIO_ConfigOutput_t
  *********************************************/
 typedef enum OUTPUT_TYPES{
-	GPIO_GP_PUSH_PULL,								/*GPIO General Purpose push-pull*/
-	GPIO_GP_OPEN_DRAIN,								/*GPIO General Purpose open-drain*/
-	GPIO_AF_PUSH_PULL,								/*GPIO Alternate function push-pull*/
-	GPIO_AF_OPEN_DRAIN								/*GPIO Alternate function open-drain*/
+	GPIO_OUT_GP_PUSH_PULL,								/*GPIO General Purpose push-pull*/
+	GPIO_OUT_GP_OPEN_DRAIN,								/*GPIO General Purpose open-drain*/
+	GPIO_OUT_AF_PUSH_PULL,								/*GPIO Alternate function push-pull*/
+	GPIO_OUT_AF_OPEN_DRAIN								/*GPIO Alternate function open-drain*/
 }GPIO_ConfigOutput_t;
 /**********************************************
  * GPIO Mode Configuration (input or output)
@@ -87,7 +87,7 @@ typedef struct PIN_HANDLER{
 }GPIO_handle_t;
 
 /********************************************
- * GPIO Functions
+ * GPIO APIS Functions
  *******************************************/
 void GPIO_CLK_Status(GPIO_RegDef_t *pGPIOx, uint8_t status);
 void GPIO_Setup(GPIO_handle_t *pGPIOHandle);
@@ -97,5 +97,11 @@ uint16_t GPIO_ReadPort(GPIO_RegDef_t *pGPIOx);
 void GPIO_WritePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin, uint8_t value);
 void GPIO_WritePort(GPIO_RegDef_t *pGPIOx, uint16_t value);
 void GPIO_TogglePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin);
+void GPIO_Input_Init(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_ConfigInput_t GPIO_CONFIG);
+void GPIO_Output_Init(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_Mode_t FREQ_OUTPUT, GPIO_ConfigOutput_t GPIO_CONFIG);
 
+/********************************************
+ * EXAMPLES Functions
+ *******************************************/
+void GPIO_BLINK_LED();
 #endif /* DRIVERS_INC_STM32F103XX_GPIO_H_ */

@@ -25,16 +25,14 @@
 #endif
 
 void delay(uint32_t time);
-void GPIO_BLINK_LED_init();
-
-GPIO_handle_t LED;
 
 int main(void)
 {
-	GPIO_BLINK_LED_init();
-    /* Loop forever */
+	/*Blinking Manually using GPIO API*/
+	GPIO_Output_Init(GPIOC, GPIO_PIN_13, GPIO_OUTPUT_MODE_2MHZ, GPIO_OUT_GP_OPEN_DRAIN);
+
 	while(1){
-		GPIO_TogglePin(LED.pGPIOx, GPIO_PIN_13);
+		GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 		delay(500000);
 	}
 }
@@ -43,13 +41,4 @@ void delay(uint32_t time){
 	while(time){
 		time --;
 	}
-}
-
-void GPIO_BLINK_LED_init(){
-	LED.pGPIOx = GPIOC;
-	LED.GPIO_config.GPIO_Pin = GPIO_PIN_13;
-	LED.GPIO_config.GPIO_CRR.GPIO_Mode = GPIO_OUTPUT_MODE_2MHZ;
-	LED.GPIO_config.GPIO_CRR.GPIO_ConfigOutput = GPIO_GP_OPEN_DRAIN;
-
-	GPIO_Setup(&LED);
 }

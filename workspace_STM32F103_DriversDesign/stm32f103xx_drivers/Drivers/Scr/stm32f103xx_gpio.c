@@ -2,6 +2,7 @@
 #include "stm32f103xx.h"
 
 GPIO_handle_t GPIO;
+GPIO_handle_t LED;
 /*******************************************
  * GPIO Function: Clock Enable/Disable
  * Arguments: 	*pGPIOx	- GPIOx PORT
@@ -127,4 +128,55 @@ void GPIO_WritePort(GPIO_RegDef_t *pGPIOx, uint16_t value){
  *******************************************/
 void GPIO_TogglePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin){
 	pGPIOx->ODR ^= (1 << pin);
+}
+
+/************************************************
+ * API GPIO INPUT INIT: Initialize Pin settings
+ * Arguments:
+ * 		*pGPIOx 	- GPIOx PORT
+ * 		GPIO_PIN_x	- 0 to 15
+ * 		GPIO_CONFIG	- GPIO_IN_ANALOG
+ * 					  GPIO_IN_FLOATING
+ * 					  GPIO_IN_PULL_UP_DOWN
+ ***********************************************/
+void GPIO_Input_Init(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_ConfigInput_t GPIO_CONFIG){
+	GPIO.GPIO_config.GPIO_CRR.GPIO_Mode = GPIO_INPUT_MODE;
+	GPIO.pGPIOx = pGPIOx;
+	GPIO.GPIO_config.GPIO_Pin = GPIO_PIN_x;
+	GPIO.GPIO_config.GPIO_CRR.GPIO_ConfigInput = GPIO_CONFIG;
+
+	GPIO_Setup(&GPIO);
+}
+/**************************************************
+ * API GPIO OUTPUT INIT: Initialize Pin settings
+ * Arguments:
+ * 		*pGPIOx 	- GPIOx PORT
+ * 		GPIO_PIN_x	- 0 to 15
+ * 		GPIO_CONFIG	- GPIO_ANALOG
+ * 					  GPIO_FLOATING
+ * 					  GPIO_PULL_UP_DOWN
+ * 		FREQ_OUTPUT - GPIO_OUTPUT_MODE_10MHZ
+ * 					  GPIO_OUTPUT_MODE_2MHZ
+ * 					  GPIO_OUTPUT_MODE_50MHZ
+ *************************************************/
+void GPIO_Output_Init(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_Mode_t FREQ_OUTPUT, GPIO_ConfigOutput_t GPIO_CONFIG){
+	GPIO.GPIO_config.GPIO_CRR.GPIO_Mode = FREQ_OUTPUT;
+	GPIO.pGPIOx = pGPIOx;
+	GPIO.GPIO_config.GPIO_Pin = GPIO_PIN_x;
+	GPIO.GPIO_config.GPIO_CRR.GPIO_ConfigOutput = GPIO_CONFIG;
+
+	GPIO_Setup(&GPIO);
+}
+/***********************************************
+ * EXAMPLES
+ * GPIO Function: Blinking LED contained in MCU
+ **********************************************/
+void GPIO_BLINK_LED(){
+	LED.pGPIOx = GPIOC;
+	LED.GPIO_config.GPIO_Pin = GPIO_PIN_13;
+	LED.GPIO_config.GPIO_CRR.GPIO_Mode = GPIO_OUTPUT_MODE_2MHZ;
+	LED.GPIO_config.GPIO_CRR.GPIO_ConfigOutput = GPIO_OUT_GP_OPEN_DRAIN;
+
+	GPIO_Setup(&LED);
+	GPIO_TogglePin(LED.pGPIOx, LED.GPIO_config.GPIO_Pin);
 }
