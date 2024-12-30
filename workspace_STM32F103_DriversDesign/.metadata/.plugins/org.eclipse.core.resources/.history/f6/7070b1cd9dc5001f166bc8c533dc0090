@@ -1,0 +1,100 @@
+/*
+ * stm32f103xx_gpio.h
+ *
+ *  Created on: Dec 27, 2024
+ *      Author: joane
+ */
+
+#ifndef DRIVERS_INC_STM32F103XX_GPIO_H_
+#define DRIVERS_INC_STM32F103XX_GPIO_H_
+
+#include "stm32f103xx.h"
+/**********************************************
+ * GPIO PIN Available to be chosen in MCU
+ * Type: GPIO_Pin_t
+ *********************************************/
+typedef enum{
+	GPIO_PIN_0,
+	GPIO_PIN_1,
+	GPIO_PIN_2,
+	GPIO_PIN_3,
+	GPIO_PIN_4,
+	GPIO_PIN_5,
+	GPIO_PIN_6,
+	GPIO_PIN_7,
+	GPIO_PIN_8,
+	GPIO_PIN_9,
+	GPIO_PIN_10,
+	GPIO_PIN_11,
+	GPIO_PIN_12,
+	GPIO_PIN_13,
+	GPIO_PIN_14,
+	GPIO_PIN_15
+}GPIO_Pin_t;
+/**********************************************
+ * GPIO Input Configuration
+ * Type: GPIO_ConfigInput_t
+ *********************************************/
+typedef enum{
+	GPIO_ANALOG,									/*GPIO Analog mode*/
+	GPIO_FLOATING,									/*GPIO Floating input mode*/
+	GPIO_PULL_UP_DOWN,								/*GPIO Input with pull-up or pull-down*/
+}GPIO_ConfigInput_t;
+/**********************************************
+ * GPIO Output Configuration
+ * Type: GPIO_ConfigOutput_t
+ *********************************************/
+typedef enum{
+	GPIO_GP_PUSH_PULL,								/*GPIO General Purpose push-pull*/
+	GPIO_GP_OPEN_DRAIN,								/*GPIO General Purpose open-drain*/
+	GPIO_AF_PUSH_PULL,								/*GPIO Alternate function push-pull*/
+	GPIO_AF_OPEN_DRAIN								/*GPIO Alternate function open-drain*/
+}GPIO_ConfigOutput_t;
+/**********************************************
+ * GPIO Mode Configuration (input or output)
+ * Type: GPIO_Mode_t
+ *********************************************/
+typedef enum{
+	GPIO_INPUT_MODE,								/*Input mode*/
+	GPIO_OUTPUT_MODE_10MHZ,							/*Maximum Output speed 10MHZ*/
+	GPIO_OUTPUT_MODE_2MHZ,							/*Maximum Output speed 2MHZ*/
+	GPIO_OUTPUT_MODE_50MHZ							/*Maximum Output speed 50MHZ*/
+}GPIO_Mode_t;
+/*********************************************
+ * GPIO Configuration Register
+ * Type: GPIO_CRR_t
+ ********************************************/
+typedef struct{
+	GPIO_Mode_t GPIO_Mode;							/*GPIO_Mode_t:INPUT or OUTPUT*/
+	GPIO_ConfigInput_t GPIO_ConfigInput;			/*GPIO_ConfigInput_t: Type of INPUT*/
+	GPIO_ConfigOutput_t GPIO_ConfigOutput;			/*GPIO_ConfigOutput_t:Type of OUTPUT*/
+}GPIO_CRR_t;
+/*********************************************
+ * GPIO Configuration Options
+ * Type: GPIO_Config_t
+ ********************************************/
+typedef struct{
+	GPIO_Pin_t GPIO_Pin;							/*GPIO_Pin_t: PIN from PORT*/
+	GPIO_CRR_t GPIO_CRR;							/*GPIO_CRR_t: Configuration Register*/
+}GPIO_Config_t;
+/*********************************************
+ * GPIO Configuration Options
+ * Type: GPIO_handle_t
+ ********************************************/
+typedef struct{
+	GPIO_RegDef_t *pGPIOx;							/*GPIO_RegDef_t - GPIO Configurable Available Registers*/
+	GPIO_Config_t GPIO_config;						/*GPIO_Config_t - Manage GPIO Configuration Register*/
+}GPIO_handle_t;
+
+/********************************************
+ * GPIO Functions
+ *******************************************/
+void GPIO_CLK_Status(GPIO_RegDef_t *pGPIOx, uint8_t status);
+void GPIO_Init(GPIO_handle_t *pGPIOHandle);
+void GPIO_DeInit(GPIO_RegDef_t *pGPIOx);
+uint8_t GPIO_ReadPin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin);
+uint16_t GPIO_ReadPort(GPIO_RegDef_t *pGPIOx);
+void GPIO_WritePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin, uint8_t value);
+void GPIO_WritePort(GPIO_RegDef_t *pGPIOx, uint16_t value);
+void GPIO_TogglePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin);
+#endif /* DRIVERS_INC_STM32F103XX_GPIO_H_ */

@@ -1,0 +1,3 @@
+First approach to GPIO Driver:
+* Created GPIO header and core to manage GPIO Registers. 
+* Added LED Blink of MCU at the main core file using GPIO created from scratch APIs.

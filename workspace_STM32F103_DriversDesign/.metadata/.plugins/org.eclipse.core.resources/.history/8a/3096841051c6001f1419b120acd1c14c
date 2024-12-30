@@ -1,0 +1,148 @@
+#include "stm32f103xx_gpio.h"
+#include "stm32f103xx.h"
+
+GPIO_handle_t GPIO;
+/*******************************************
+ * GPIO Function: Clock Enable/Disable
+ * Arguments: 	*pGPIOx	- GPIOx PORT
+ * 				status	- ENABLE or DISABLE
+ ******************************************/
+void GPIO_CLK_Status(GPIO_RegDef_t *pGPIOx, uint8_t status){
+	/*Check if CLK from PORTx should be set to enable*/
+	if(status == ENABLE){
+		if(pGPIOx == GPIOA){
+			GPIOA_En_CLK();
+		}
+		else if(pGPIOx == GPIOB){
+			GPIOB_En_CLK();
+		}
+		else if(pGPIOx == GPIOC){
+			GPIOC_En_CLK();
+		}
+	}
+	/*Check if CLK from PORTx should be set to disable*/
+	else if(status == DISABLE){
+		if(pGPIOx == GPIOA){
+			GPIOA_Dis_CLK();
+		}
+		else if(pGPIOx == GPIOB){
+			GPIOB_Dis_CLK();
+		}
+		else if(pGPIOx == GPIOC){
+			GPIOC_Dis_CLK();
+		}
+	}
+}
+/***********************************************
+ * GPIO Function: Initialize GPIOx
+ * Arguments: 	*pGPIOHandle
+ * Therefore, pointer should have values for:
+ * 		pGPIOx
+ * 		GPIO_config.GPIO_Pin
+ * 		GPIO_config.GPIO_CRR.GPIO_Mode
+ * 		GPIO_config.GPIO_CRR.GPIO_ConfigOutput
+ **********************************************/
+void GPIO_Setup(GPIO_handle_t *pGPIOHandle){
+	/*Enable CLK from PORTx*/
+	GPIO_CLK_Status(pGPIOHandle->pGPIOx, ENABLE);
+
+	uint8_t rIndx = pGPIOHandle->GPIO_config.GPIO_Pin / 8;				/*Calculate Register index from CRL/CRH: CRR[0],CRR[1] respectively*/
+	uint8_t bMIndx = 4*(pGPIOHandle->GPIO_config.GPIO_Pin % 8);   		/*Calculate Bit MODE from CRR register index 0 to 31*/
+	uint8_t bCIndx =(4*(pGPIOHandle->GPIO_config.GPIO_Pin % 8)) + 2;    /*Calculate Bit CNF from CRR register index 0 to 31*/
+
+	/*Set MODE bits from CRR*/
+	pGPIOHandle->pGPIOx->CRR[rIndx] &= ~(0x03 << bMIndx);													/*Reset MODE bits*/
+	pGPIOHandle->pGPIOx->CRR[rIndx] |= (pGPIOHandle->GPIO_config.GPIO_CRR.GPIO_Mode << bMIndx);				/*Set desired MODE bits*/
+
+	/*Set CNF bits from CRR*/
+	pGPIOHandle->pGPIOx->CRR[rIndx] &= ~(0x03 << bCIndx);													/*Reset CNF bits*/
+	/*Check if PIN Direction is set as INPUT or OUTPUT*/
+	if(pGPIOHandle->GPIO_config.GPIO_CRR.GPIO_Mode == GPIO_INPUT_MODE){
+		pGPIOHandle->pGPIOx->CRR[rIndx] |= (pGPIOHandle->GPIO_config.GPIO_CRR.GPIO_ConfigInput << bCIndx);	/*Set desired CNF bits*/
+	}else{
+		pGPIOHandle->pGPIOx->CRR[rIndx] |= (pGPIOHandle->GPIO_config.GPIO_CRR.GPIO_ConfigOutput << bCIndx);	/*Set desired CNF bits*/
+	}
+}
+/*******************************************
+ * GPIO Function: Reset GPIOx Port
+ * Arguments: 	*pGPIOx	- GPIOx PORT
+ ******************************************/
+void GPIO_DeInit(GPIO_RegDef_t *pGPIOx){
+	/*Check which PORTx should be reset */
+	if(pGPIOx == GPIOA){
+		GPIOA_RESET();
+	}
+	else if(pGPIOx == GPIOB){
+		GPIOB_RESET();
+	}
+	else if(pGPIOx == GPIOC){
+		GPIOC_RESET();
+	}
+}
+/*******************************************
+ * GPIO Function: Read Pin from GPIOx PORT
+ * Arguments: 	*pGPIOx	- GPIOx PORT
+ * 				 pin	- 0 to 15
+ * Returns: 1 or 0 from GPIOx PIN
+ ******************************************/
+uint8_t GPIO_ReadPin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin){
+	return (uint8_t)(((pGPIOx -> IDR) >> pin) & 0x01);
+}
+/*******************************************
+ * GPIO Function: Read GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx PORT
+ * Returns: 16 bits from PORTx reading
+ ******************************************/
+uint16_t GPIO_ReadPort(GPIO_RegDef_t *pGPIOx){
+	return (uint16_t)((pGPIOx -> IDR) & 0xFFFF);
+}
+/*******************************************
+ * GPIO Function: Write pin for GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx PORT
+ * 				 pin	- 0 to 15
+ * 				 value	- SET or RESET
+ ******************************************/
+void GPIO_WritePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin, uint8_t value){
+	/*Write '1' to desired PIN from PORTx*/
+	if(value == SET){
+		pGPIOx -> ODR |= (0x01 << pin);
+	}
+	/*Write '0' to desired PIN from PORTx*/
+	else if(value == RESET){
+		pGPIOx -> ODR &= ~(0x01 << pin);
+	}
+}
+/*******************************************
+ * GPIO Function: Write whole GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx PORT
+ * 				 value	- 0bxxxx xxxx
+ ******************************************/
+void GPIO_WritePort(GPIO_RegDef_t *pGPIOx, uint16_t value){
+	pGPIOx -> ODR = (uint32_t)value;
+}
+/********************************************
+ * GPIO Function: Toggle pin from GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx PORT
+ * 				 pin	- 0 to 15
+ *******************************************/
+void GPIO_TogglePin(GPIO_RegDef_t GPIOx, GPIO_Pin_t pin){
+	GPIO.pGPIOx = &GPIOx;
+	pGPIOx->ODR ^= (1 << pin);
+}
+
+void GPIO_Init(GPIO_RegDef_t GPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_Mode_t PIN_DIRECTION){
+	GPIO.pGPIOx = &GPIOx;
+	GPIO.GPIO_config.GPIO_Pin = GPIO_PIN_x;
+	GPIO.GPIO_config.GPIO_CRR.GPIO_Mode = PIN_DIRECTION;
+
+	/*Setting default INPUT Configuration*/
+	if(PIN_DIRECTION == GPIO_INPUT_MODE){
+		GPIO.GPIO_config.GPIO_CRR.GPIO_ConfigInput = GPIO_ANALOG;
+	}
+	/*Setting default OUTPUT Configuration*/
+	else{
+		GPIO.GPIO_config.GPIO_CRR.GPIO_ConfigOutput = GPIO_GP_OPEN_DRAIN;
+	}
+
+	GPIO_Setup(&GPIO);
+}

@@ -1,0 +1,22 @@
+20:01:47 **** Incremental Build of configuration Debug for project stm32f103xx_drivers ****
+make -j8 all 
+arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F1 -DSTM32F103C8Tx -c -I../Inc -I"D:/Users/Joanellie/Documentos/Embedded Systems Repositories/STM32_Repository/workspace_STM32F103_DriversDesign/stm32f103xx_drivers/Drivers/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
+arm-none-eabi-gcc "../Drivers/Scr/stm32f103xx_gpio.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F1 -DSTM32F103C8Tx -c -I../Inc -I"D:/Users/Joanellie/Documentos/Embedded Systems Repositories/STM32_Repository/workspace_STM32F103_DriversDesign/stm32f103xx_drivers/Drivers/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/Scr/stm32f103xx_gpio.d" -MT"Drivers/Scr/stm32f103xx_gpio.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Drivers/Scr/stm32f103xx_gpio.o"
+arm-none-eabi-gcc -o "stm32f103xx_drivers.elf" @"objects.list"   -mcpu=cortex-m3 -T"D:\Users\Joanellie\Documentos\Embedded Systems Repositories\STM32_Repository\workspace_STM32F103_DriversDesign\stm32f103xx_drivers\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f103xx_drivers.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: stm32f103xx_drivers.elf
+ 
+arm-none-eabi-size  stm32f103xx_drivers.elf 
+arm-none-eabi-objdump -h -S stm32f103xx_drivers.elf  > "stm32f103xx_drivers.list"
+   text	   data	    bss	    dec	    hex	filename
+   1156	      0	   1576	   2732	    aac	stm32f103xx_drivers.elf
+Finished building: default.size.stdout
+ 
+Finished building: stm32f103xx_drivers.list
+ 
+20:01:58 **** Incremental Build of configuration Debug for project stm32f103xx_drivers ****
+make -j8 all 
+arm-none-eabi-size  stm32f103xx_drivers.elf 
+   text	   data	    bss	    dec	    hex	filename
+   1156	      0	   1576	   2732	    aac	stm32f103xx_drivers.elf
+Finished building: default.size.stdout
+ 

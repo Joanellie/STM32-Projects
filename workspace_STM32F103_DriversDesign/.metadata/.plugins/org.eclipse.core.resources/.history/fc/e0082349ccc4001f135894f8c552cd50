@@ -1,0 +1,129 @@
+#include "stm32f103xx_gpio.h"
+#include "stm32f103xx.h"
+
+/*******************************************
+ * GPIO Function: Clock Enable/Disable
+ * Arguments: 	*pGPIOx	- GPIOx
+ * 				status	- ENABLE or DISABLE
+ ******************************************/
+void GPIO_CLK_Status(GPIO_RegDef_t *pGPIOx, uint8_t status){
+	if(status == ENABLE){
+		if(pGPIOx == GPIOA){
+			GPIOA_En_CLK();
+		}
+		else if(pGPIOx == GPIOB){
+			GPIOB_En_CLK();
+		}
+		else if(pGPIOx == GPIOC){
+			GPIOC_En_CLK();
+		}
+	}
+	else if(status == DISABLE){
+		if(pGPIOx == GPIOA){
+			GPIOA_Dis_CLK();
+		}
+		else if(pGPIOx == GPIOB){
+			GPIOB_Dis_CLK();
+		}
+		else if(pGPIOx == GPIOC){
+			GPIOC_Dis_CLK();
+		}
+	}
+}
+void GPIO_Input_Setup(GPIO_handle_t *pGPIOHandle, GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin, GPIO_ConfigInput_t InputType){
+	uint8_t Config;
+	if(pin <= 7){
+		pGPIOHandle->GPIO_config[0].GPIO_Mode &= (0x00 << 0);
+		pGPIOHandle->GPIO_config[0].GPIO_ConfigInput |= ((InputType * 0x11) << 2);
+		Config = pGPIOHandle->GPIO_config[0].GPIO_Mode
+				|| pGPIOHandle->GPIO_config[0].GPIO_ConfigInput;
+
+		pGPIOx->CRR[0] &= (Config << (4*pin + 2));
+	}
+	else if(pin <= 15){
+		pGPIOHandle->GPIO_config[1].GPIO_ConfigInput |= ((InputType * 0x11) << 2);
+		Config = pGPIOHandle->GPIO_config[1].GPIO_Mode
+				|| pGPIOHandle->GPIO_config[1].GPIO_ConfigInput;
+
+		pGPIOx->CRR[1] &= (Config << (4*pin + 2));
+	}
+}
+void GPIO_Output_Setup(GPIO_handle_t *pGPIOHandle, GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin, GPIO_ConfigOutput_t OutputType){
+	uint8_t Config;
+	if(pin <= 7){
+		pGPIOHandle->GPIO_config[0].GPIO_Mode |= (OutputType << 0);
+		pGPIOHandle->GPIO_config[0].GPIO_ConfigOutput |= ((OutputType * 0x11) << 2);
+		Config = pGPIOHandle->GPIO_config[0].GPIO_Mode
+				|| pGPIOHandle->GPIO_config[0].GPIO_ConfigOutput;
+
+		pGPIOx->CRR[0] &= (Config << (4*pin + 2));
+	}
+	else if(pin <= 15){
+		pGPIOHandle->GPIO_config[1].GPIO_Mode &= (OutputType << 0);
+		pGPIOHandle->GPIO_config[1].GPIO_ConfigOutput |= ((OutputType * 0x11) << 2);
+		Config = pGPIOHandle->GPIO_config[1].GPIO_Mode
+				|| pGPIOHandle->GPIO_config[1].GPIO_ConfigOutput;
+
+		pGPIOx->CRR[1] &= (Config << (4*pin + 2));
+	}
+}
+/*******************************************
+ * GPIO Function: Reset GPIOx Port
+ * Arguments: 	*pGPIOx	- GPIOx
+ ******************************************/
+void GPIO_DeInit(GPIO_RegDef_t *pGPIOx){
+	if(pGPIOx == GPIOA){
+		GPIOA_RESET();
+	}
+	else if(pGPIOx == GPIOB){
+		GPIOB_RESET();
+	}
+	else if(pGPIOx == GPIOC){
+		GPIOC_RESET();
+	}
+}
+/*******************************************
+ * GPIO Function: Read Pin from GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx
+ * 				 pin	- 0 to 15
+ ******************************************/
+uint8_t GPIO_ReadPin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin){
+	return (uint8_t)(((pGPIOx -> IDR) >> pin) & 0x01);
+}
+/*******************************************
+ * GPIO Function: Read GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx
+ ******************************************/
+uint16_t GPIO_ReadPort(GPIO_RegDef_t *pGPIOx){
+	return (uint16_t)((pGPIOx -> IDR) & 0xFFFF);
+}
+/*******************************************
+ * GPIO Function: Write pin for GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx
+ * 				 pin	- 0 to 15
+ * 				 value	- SET or RESET
+ ******************************************/
+void GPIO_WritePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin, uint8_t value){
+	if(value == SET){
+		pGPIOx -> ODR |= (value << pin);
+	}
+	else if(value == RESET){
+		pGPIOx -> ODR &= (value << pin);
+	}
+}
+/*******************************************
+ * GPIO Function: Write whole GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx
+ * 				 value	- 0bxxxx xxxx
+ ******************************************/
+void GPIO_WritePort(GPIO_RegDef_t *pGPIOx, uint16_t value){
+	pGPIOx -> ODR = (uint32_t)value;
+}
+/********************************************
+ * GPIO Function: Toggle pin from GPIOx port
+ * Arguments: 	*pGPIOx	- GPIOx
+ * 				 pin	- 0 to 15
+ *******************************************/
+void GPIO_TogglePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin){
+	pGPIOx -> ODR ^= (1 << pin);
+}

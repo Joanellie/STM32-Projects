@@ -1,0 +1,67 @@
+/*
+ * stm32f103xx.h
+ *
+ *  Created on: Dec 26, 2024
+ *      Author: joane
+ */
+
+#ifndef DRIVERS_INC_STM32F103XX_H_
+#define DRIVERS_INC_STM32F103XX_H_
+
+/******************************************
+ * Register Address for GPIO
+ * Bus: APB2
+ *****************************************/
+
+#define APB2_PERIPH_BASE_ADDR				  0x40010800UL						/*Memory map bus address started from GPIOA*/
+
+#define GPIOA_BASE_ADDR						(APB2_PERIPH_BASE_ADDR + 0x0000) 	/*Memory map address for GPIOA*/
+#define GPIOB_BASE_ADDR						(APB2_PERIPH_BASE_ADDR + 0x0400)	/*Memory map address for GPIOB*/
+#define GPIOC_BASE_ADDR						(APB2_PERIPH_BASE_ADDR + 0x0800)	/*Memory map address for GPIOC*/
+
+/*GPIO Register Map */
+typedef struct{
+	volatile uint32_t CRR[2];				/*GPIO configuration input/output mode register*/
+	volatile uint32_t IDR;					/*GPIO port input data register*/
+	volatile uint32_t ODR;					/*GPIO port output data register*/
+	volatile uint32_t BSRR;					/*GPIO port bit set/reset data register*/
+	volatile uint32_t BRR;					/*GPIO port bit reset data register*/
+	volatile uint32_t LCKR;					/*GPIO port configuration lock register*/
+}GPIO_RegDef_t;
+
+#define GPIOA	((GPIO_RegDef_t *)GPIOA_BASE_ADDR)	/*Pointer to manipulate the whole GPIOA register*/
+#define GPIOB	((GPIO_RegDef_t *)GPIOB_BASE_ADDR)	/*Pointer to manipulate the whole GPIOB register*/
+#define GPIOC	((GPIO_RegDef_t *)GPIOC_BASE_ADDR)	/*Pointer to manipulate the whole GPIOC register*/
+/******************************************
+ * Register Address for BUS AHB
+ * Bus: AHB
+ *****************************************/
+
+#define SDIO_BASE_ADDR						0x40018000UL						/*Memory map address for SDIO*/
+
+#define AHB_PERIPH_BASE_ADDR				0x40020000UL 						/*Memory map bus address started from DMA1*/
+
+#define DMA1_BASE_ADDR						(AHB_PERIPH_BASE_ADDR + 0x0000)		/*Memory map address for RCC*/
+#define DMA2_BASE_ADDR						(AHB_PERIPH_BASE_ADDR + 0x0400)		/*Memory map address for RCC*/
+#define RCC_BASE_ADDR						(AHB_PERIPH_BASE_ADDR + 0x0800)		/*Memory map address for RCC*/
+#define FLASH_BASE_ADDR						(AHB_PERIPH_BASE_ADDR + 0x1000)		/*Memory map address for RCC*/
+#define CRC_BASE_ADDR						(AHB_PERIPH_BASE_ADDR + 0x1400)		/*Memory map address for RCC*/
+#define ETHERNET_BASE_ADDR					(AHB_PERIPH_BASE_ADDR + 0x2000)		/*Memory map address for RCC*/
+#define USB_BASE_ADDR						(AHB_PERIPH_BASE_ADDR + 0x3000)		/*Memory map address for RCC*/
+#define FSMC_BASE_ADDR						(AHB_PERIPH_BASE_ADDR + 0x3400)		/*Memory map address for RCC*/
+
+typedef struct{
+	uint32_t CR;
+	uint32_t CFGR;
+	uint32_t CIR;
+	uint32_t APB2RSTR;
+	uint32_t APB1RSTR;
+	uint32_t AHBENR;
+	uint32_t APB2ENR;
+	uint32_t APB1ENR;
+	uint32_t BDCR;
+}RCC_RegDef_t;
+
+#define RCC	((RCC_RegDef_t *)RCC_BASE_ADDR)
+
+#endif /* DRIVERS_INC_STM32F103XX_H_ */
