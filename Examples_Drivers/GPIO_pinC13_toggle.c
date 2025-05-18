@@ -28,8 +28,17 @@ void delay(uint32_t time);
 
 int main(void)
 {
+	/*Blinking Manually using GPIO API*/
+	GPIO_Output_Init(GPIOC, GPIO_PIN_13, GPIO_OUTPUT_MODE_2MHZ, GPIO_OUT_GP_OPEN_DRAIN);
 
 	while(1){
+		GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+		delay(500000);
+	}
+}
 
+void delay(uint32_t time){
+	while(time){
+		time --;
 	}
 }

@@ -20,6 +20,9 @@
 #include <stm32f103xx.h>
 #include "stm32f103xx_gpio.h"
 
+/*For controlling internal LED of stm32 PCB in pin C13*/
+#define LED_ON RESET
+#define LED_OFF SET
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
@@ -28,8 +31,18 @@ void delay(uint32_t time);
 
 int main(void)
 {
+	/*GPIO Init for LED blinking*/
+	GPIO_Output_Init(GPIOC, GPIO_PIN_13, GPIO_OUTPUT_MODE_2MHZ, GPIO_OUT_GP_PUSH_PULL);
+	/*GPIO Init for button*/
+	GPIO_Input_Init(GPIOA, GPIO_PIN_0, GPIO_IN_LOGIC, GPIO_PULL_DOWN);
 
 	while(1){
-
+		/*Check if pin reading is '1' (BTN with external pull-down resistor)*/
+		if(GPIO_ReadPin(GPIOA,GPIO_PIN_0)==1){
+			GPIO_WritePin(GPIOC,GPIO_PIN_13,LED_ON); /*LED turns on in reset state due to inverse internal connection*/
+		}else{
+			/*Pin reading is '0'*/
+			GPIO_WritePin(GPIOC,GPIO_PIN_13,LED_OFF); /*LED turns off in set state due to inverse internal connection*/
+		}
 	}
 }
