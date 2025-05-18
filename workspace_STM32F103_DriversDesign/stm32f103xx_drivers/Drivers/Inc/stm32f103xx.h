@@ -13,6 +13,7 @@
 #define ENABLE 		1
 #define DISABLE 	0
 
+/*stm32f103c8t6 has */
 #define SET 		1
 #define RESET	 	0
 

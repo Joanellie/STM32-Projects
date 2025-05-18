@@ -1,0 +1,4 @@
+Add to GPIO Driver:
+* Automated GPIO API for Input and Output settings. 
+* Automated Blinking LED example.
+* User expectations - Blink API and GPIO API usage in one single usae function respectively.

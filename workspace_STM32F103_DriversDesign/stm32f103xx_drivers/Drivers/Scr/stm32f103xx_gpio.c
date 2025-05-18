@@ -1,5 +1,6 @@
 #include "stm32f103xx_gpio.h"
 #include "stm32f103xx.h"
+#include <stdarg.h>
 
 GPIO_handle_t GPIO;
 GPIO_handle_t LED;
@@ -63,6 +64,50 @@ void GPIO_Setup(GPIO_handle_t *pGPIOHandle){
 	}else{
 		pGPIOHandle->pGPIOx->CRR[rIndx] |= (pGPIOHandle->GPIO_config.GPIO_CRR.GPIO_ConfigOutput << bCIndx);	/*Set desired CNF bits*/
 	}
+}
+/************************************************
+ * API GPIO INPUT INIT: Initialize Pin settings
+ * Arguments:
+ * 		*pGPIOx 	- GPIOx PORT
+ * 		GPIO_PIN_x	- 0 to 15
+ * 		GPIO_CONFIG	- GPIO_IN_ANALOG
+ * 					  GPIO_IN_FLOATING
+ * 					  GPIO_IN_PULL_UP_DOWN
+ ***********************************************/
+void GPIO_Input_Init(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_ConfigInput_t GPIO_CONFIG, GPIO_PullType_t GPIO_PULL_TYPE){
+	GPIO.GPIO_config.GPIO_CRR.GPIO_Mode = GPIO_INPUT_MODE;
+	GPIO.pGPIOx = pGPIOx;
+	GPIO.GPIO_config.GPIO_Pin = GPIO_PIN_x;
+	GPIO.GPIO_config.GPIO_CRR.GPIO_ConfigInput = GPIO_CONFIG;
+	GPIO_Setup(&GPIO);
+	/*STM32F103 needs to write on ODR register to now if it is pull-up or pull-down*/
+	if(GPIO_CONFIG == GPIO_IN_LOGIC){
+		if(GPIO_PULL_TYPE == GPIO_PULL_UP){
+			pGPIOx->ODR |= (0x01 << GPIO_PIN_x);
+		}else if(GPIO_PULL_TYPE == GPIO_PULL_DOWN){
+			pGPIOx->ODR &= ~(0x01 << GPIO_PIN_x);
+		}
+	}
+}
+/**************************************************
+ * API GPIO OUTPUT INIT: Initialize Pin settings
+ * Arguments:
+ * 		*pGPIOx 	- GPIOx PORT
+ * 		GPIO_PIN_x	- 0 to 15
+ * 		GPIO_CONFIG	- GPIO_ANALOG
+ * 					  GPIO_FLOATING
+ * 					  GPIO_PULL_UP_DOWN
+ * 		FREQ_OUTPUT - GPIO_OUTPUT_MODE_10MHZ
+ * 					  GPIO_OUTPUT_MODE_2MHZ
+ * 					  GPIO_OUTPUT_MODE_50MHZ
+ *************************************************/
+void GPIO_Output_Init(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_Mode_t FREQ_OUTPUT, GPIO_ConfigOutput_t GPIO_CONFIG){
+	GPIO.GPIO_config.GPIO_CRR.GPIO_Mode = FREQ_OUTPUT;
+	GPIO.pGPIOx = pGPIOx;
+	GPIO.GPIO_config.GPIO_Pin = GPIO_PIN_x;
+	GPIO.GPIO_config.GPIO_CRR.GPIO_ConfigOutput = GPIO_CONFIG;
+
+	GPIO_Setup(&GPIO);
 }
 /*******************************************
  * GPIO Function: Reset GPIOx Port
@@ -128,44 +173,6 @@ void GPIO_WritePort(GPIO_RegDef_t *pGPIOx, uint16_t value){
  *******************************************/
 void GPIO_TogglePin(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t pin){
 	pGPIOx->ODR ^= (1 << pin);
-}
-
-/************************************************
- * API GPIO INPUT INIT: Initialize Pin settings
- * Arguments:
- * 		*pGPIOx 	- GPIOx PORT
- * 		GPIO_PIN_x	- 0 to 15
- * 		GPIO_CONFIG	- GPIO_IN_ANALOG
- * 					  GPIO_IN_FLOATING
- * 					  GPIO_IN_PULL_UP_DOWN
- ***********************************************/
-void GPIO_Input_Init(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_ConfigInput_t GPIO_CONFIG){
-	GPIO.GPIO_config.GPIO_CRR.GPIO_Mode = GPIO_INPUT_MODE;
-	GPIO.pGPIOx = pGPIOx;
-	GPIO.GPIO_config.GPIO_Pin = GPIO_PIN_x;
-	GPIO.GPIO_config.GPIO_CRR.GPIO_ConfigInput = GPIO_CONFIG;
-
-	GPIO_Setup(&GPIO);
-}
-/**************************************************
- * API GPIO OUTPUT INIT: Initialize Pin settings
- * Arguments:
- * 		*pGPIOx 	- GPIOx PORT
- * 		GPIO_PIN_x	- 0 to 15
- * 		GPIO_CONFIG	- GPIO_ANALOG
- * 					  GPIO_FLOATING
- * 					  GPIO_PULL_UP_DOWN
- * 		FREQ_OUTPUT - GPIO_OUTPUT_MODE_10MHZ
- * 					  GPIO_OUTPUT_MODE_2MHZ
- * 					  GPIO_OUTPUT_MODE_50MHZ
- *************************************************/
-void GPIO_Output_Init(GPIO_RegDef_t *pGPIOx, GPIO_Pin_t GPIO_PIN_x, GPIO_Mode_t FREQ_OUTPUT, GPIO_ConfigOutput_t GPIO_CONFIG){
-	GPIO.GPIO_config.GPIO_CRR.GPIO_Mode = FREQ_OUTPUT;
-	GPIO.pGPIOx = pGPIOx;
-	GPIO.GPIO_config.GPIO_Pin = GPIO_PIN_x;
-	GPIO.GPIO_config.GPIO_CRR.GPIO_ConfigOutput = GPIO_CONFIG;
-
-	GPIO_Setup(&GPIO);
 }
 /***********************************************
  * EXAMPLES
